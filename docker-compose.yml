@@ -1,0 +1,18 @@
+services:
+  promptshield:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PROMPTSHIELD_ENV=production
+      - PROMPTSHIELD_LOG_LEVEL=info
+      - PROMPTSHIELD_AUDIT_ENABLED=true
+      - PROMPTSHIELD_MAX_INPUT_LENGTH=10000
+    volumes:
+      - audit_logs:/app/audit_logs
+    restart: unless-stopped
+
+volumes:
+  audit_logs:
