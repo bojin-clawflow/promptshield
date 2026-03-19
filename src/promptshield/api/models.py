@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
-
 
 # ── Request models ───────────────────────────────────────────────────────────
 
@@ -46,7 +45,7 @@ class ShieldResponse(BaseModel):
     threats: list[ThreatDetail] = Field(default_factory=list)
     request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     latency_ms: float
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class HealthResponse(BaseModel):

@@ -64,7 +64,9 @@ async def verify_api_key(
 # ── Endpoints ────────────────────────────────────────────────────────────────
 
 
-@router.post("/shield", response_model=ShieldResponse, dependencies=[Depends(verify_api_key)])
+@router.post(
+    "/shield", response_model=ShieldResponse, dependencies=[Depends(verify_api_key)]
+)
 async def shield(body: ShieldRequest, request: Request) -> ShieldResponse:
     """Analyse a prompt for threats and return a safety verdict."""
     detector = get_detector()
@@ -111,7 +113,9 @@ async def shield(body: ShieldRequest, request: Request) -> ShieldResponse:
     return response
 
 
-@router.get("/health", response_model=HealthResponse, dependencies=[Depends(verify_api_key)])
+@router.get(
+    "/health", response_model=HealthResponse, dependencies=[Depends(verify_api_key)]
+)
 async def health() -> HealthResponse:
     """Return service health information."""
     return HealthResponse(
@@ -121,7 +125,9 @@ async def health() -> HealthResponse:
     )
 
 
-@router.get("/stats", response_model=StatsResponse, dependencies=[Depends(verify_api_key)])
+@router.get(
+    "/stats", response_model=StatsResponse, dependencies=[Depends(verify_api_key)]
+)
 async def stats() -> StatsResponse:
     """Return in-memory request statistics."""
     latencies: list[float] = _stats["latencies"]

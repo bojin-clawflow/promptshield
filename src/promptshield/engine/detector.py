@@ -14,9 +14,8 @@ import time
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
-from .patterns import PatternCategory
 from .rules import RuleDetector, RuleMatch, Sensitivity
 
 
@@ -38,7 +37,7 @@ class ThreatInfo:
     category: str
     severity: float
     matched_text: str
-    position: Optional[tuple[int, int]] = None
+    position: tuple[int, int] | None = None
     description: str = ""
 
 
@@ -89,9 +88,7 @@ def _char_entropy(text: str) -> float:
         return 0.0
     counts = Counter(text)
     length = len(text)
-    return -sum(
-        (c / length) * math.log2(c / length) for c in counts.values() if c > 0
-    )
+    return -sum((c / length) * math.log2(c / length) for c in counts.values() if c > 0)
 
 
 def _token_entropy(text: str) -> float:
@@ -101,14 +98,13 @@ def _token_entropy(text: str) -> float:
         return 0.0
     counts = Counter(tokens)
     total = len(tokens)
-    return -sum(
-        (c / total) * math.log2(c / total) for c in counts.values() if c > 0
-    )
+    return -sum((c / total) * math.log2(c / total) for c in counts.values() if c > 0)
 
 
 # ---------------------------------------------------------------------------
 # ShieldDetector
 # ---------------------------------------------------------------------------
+
 
 class ShieldDetector:
     """Main prompt injection detection orchestrator.
@@ -133,7 +129,7 @@ class ShieldDetector:
         sensitivity: Sensitivity | str = Sensitivity.MEDIUM,
         rule_weight: float = 0.7,
         heuristic_weight: float = 0.3,
-        custom_patterns: Optional[list] = None,
+        custom_patterns: list | None = None,
     ) -> None:
         if not 0.0 <= threshold <= 1.0:
             raise ValueError(f"threshold must be in [0.0, 1.0], got {threshold}")
@@ -179,8 +175,7 @@ class ShieldDetector:
         # --- Composite score ------------------------------------------------
         total_weight = self._rule_weight + self._heuristic_weight
         composite = (
-            self._rule_weight * rule_score
-            + self._heuristic_weight * heuristic_score
+            self._rule_weight * rule_score + self._heuristic_weight * heuristic_score
         ) / total_weight
         composite = min(1.0, max(0.0, composite))
 
@@ -222,9 +217,7 @@ class ShieldDetector:
             product *= 1.0 - m.severity
         return 1.0 - product
 
-    def _compute_heuristics(
-        self, text: str
-    ) -> tuple[float, dict[str, Any]]:
+    def _compute_heuristics(self, text: str) -> tuple[float, dict[str, Any]]:
         """Run lightweight heuristic checks and return (score, details)."""
         signals: list[float] = []
         details: dict[str, Any] = {}
@@ -272,7 +265,7 @@ class ShieldDetector:
         scripts: set[str] = set()
         for ch in nfc:
             if ch.isalpha():
-                cat = unicodedata.category(ch)
+                unicodedata.category(ch)
                 name = unicodedata.name(ch, "")
                 if "LATIN" in name:
                     scripts.add("LATIN")

@@ -12,18 +12,17 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
+from enum import StrEnum
 
 from .patterns import ATTACK_PATTERNS, AttackPattern, PatternCategory
 
 
-class Sensitivity(str, Enum):
+class Sensitivity(StrEnum):
     """Predefined sensitivity levels that control which patterns fire."""
 
-    LOW = "low"          # Only severity >= 0.8
-    MEDIUM = "medium"    # Only severity >= 0.5
-    HIGH = "high"        # All patterns (severity >= 0.0)
+    LOW = "low"  # Only severity >= 0.8
+    MEDIUM = "medium"  # Only severity >= 0.5
+    HIGH = "high"  # All patterns (severity >= 0.0)
 
 
 #: Minimum severity threshold for each sensitivity level.
@@ -80,7 +79,7 @@ class RuleDetector:
     def __init__(
         self,
         sensitivity: Sensitivity | str = Sensitivity.MEDIUM,
-        custom_patterns: Optional[list[AttackPattern]] = None,
+        custom_patterns: list[AttackPattern] | None = None,
         strip_zero_width: bool = True,
     ) -> None:
         if isinstance(sensitivity, str):
@@ -93,9 +92,7 @@ class RuleDetector:
         all_patterns = list(ATTACK_PATTERNS)
         if custom_patterns:
             all_patterns.extend(custom_patterns)
-        self._patterns = [
-            p for p in all_patterns if p.severity >= self._threshold
-        ]
+        self._patterns = [p for p in all_patterns if p.severity >= self._threshold]
 
     # -- public API ----------------------------------------------------------
 
@@ -139,9 +136,7 @@ class RuleDetector:
             text = _ZERO_WIDTH_RE.sub("", text)
         return text
 
-    def _match_pattern(
-        self, pattern: AttackPattern, text: str
-    ) -> list[RuleMatch]:
+    def _match_pattern(self, pattern: AttackPattern, text: str) -> list[RuleMatch]:
         """Try both regex and keyword matching for a single pattern."""
         results: list[RuleMatch] = []
 

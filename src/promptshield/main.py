@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,7 +68,11 @@ app.include_router(router)
 
 # Dashboard static files (served only if the directory exists)
 if DASHBOARD_DIR.is_dir():
-    app.mount("/dashboard", StaticFiles(directory=str(DASHBOARD_DIR), html=True), name="dashboard")
+    app.mount(
+        "/dashboard",
+        StaticFiles(directory=str(DASHBOARD_DIR), html=True),
+        name="dashboard",
+    )
 
 # ── CLI runner ───────────────────────────────────────────────────────────────
 
