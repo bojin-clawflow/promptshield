@@ -55,6 +55,22 @@
       </div>
     </section>
 
+    <!-- Support the Project -->
+    <section class="bg-gray-800/50 rounded-lg border border-gray-700/50 p-6">
+      <h2 class="text-lg font-semibold text-white mb-2">Support the Project</h2>
+      <p class="text-sm text-gray-400 mb-5">PromptShield is free and open-source. If it helps protect your AI agents, consider supporting development.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-8">
+        <div class="text-center">
+          <img src="alipay-qr.jpg" alt="Alipay QR Code" class="w-48 h-48 object-contain rounded-lg bg-white p-1">
+          <p class="text-sm text-blue-400 mt-2 font-medium">Alipay</p>
+        </div>
+        <div class="text-center">
+          <img src="wechat-qr.jpg" alt="WeChat Pay QR Code" class="w-48 h-48 object-contain rounded-lg bg-white p-1">
+          <p class="text-sm text-emerald-400 mt-2 font-medium">WeChat Pay</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Recent Activity -->
     <section class="bg-gray-800/50 rounded-lg border border-gray-700/50 p-6">
       <h2 class="text-lg font-semibold text-white mb-4">Recent Activity</h2>
@@ -87,9 +103,11 @@
         if (!statsRes.ok || !healthRes.ok) throw new Error('API error');
         const stats = await statsRes.json();
         document.getElementById('statRequests').textContent = (stats.total_requests ?? 0).toLocaleString();
-        document.getElementById('statBlocked').textContent = (stats.blocked_threats ?? 0).toLocaleString();
+        document.getElementById('statBlocked').textContent = (stats.blocked_requests ?? stats.blocked_threats ?? 0).toLocaleString();
         document.getElementById('statLatency').textContent = (stats.avg_latency_ms ?? 0).toFixed(1) + ' ms';
-        const rate = stats.detection_rate ?? 0;
+        const total = stats.total_requests ?? 0;
+        const blocked = stats.blocked_requests ?? stats.blocked_threats ?? 0;
+        const rate = total > 0 ? (blocked / total * 100) : 0;
         document.getElementById('statRate').textContent = (typeof rate === 'number' ? rate : 0).toFixed(1) + '%';
         setStatus(true);
       } catch {
@@ -123,17 +141,17 @@
         });
         if (!res.ok) throw new Error('Request failed');
         const data = await res.json();
-        const safe = data.result === 'safe';
+        const safe = data.safe === true;
         const score = (data.score ?? 0).toFixed(2);
-        const threats = data.threats?.length ? data.threats.join(', ') : 'None';
+        const threatNames = (data.threats ?? []).map(t => t.pattern_name || t).join(', ') || 'None';
 
         result.innerHTML = `<span class="${safe ? 'text-emerald-400' : 'text-red-400'} font-medium">${safe ? 'SAFE' : 'UNSAFE'}</span>` +
-          ` &middot; Score: ${score} &middot; Threats: ${threats}`;
+          ` &middot; Score: ${score} &middot; Threats: ${threatNames}`;
 
         activity.unshift({
           time: new Date().toLocaleTimeString(),
           prompt: text.length > 60 ? text.slice(0, 57) + '...' : text,
-          result: data.result, score, threats
+          safe, score, threats: threatNames
         });
         if (activity.length > 20) activity.pop();
         renderActivity();
@@ -151,7 +169,7 @@
       if (!activity.length) { noAct.classList.remove('hidden'); tbody.innerHTML = ''; return; }
       noAct.classList.add('hidden');
       tbody.innerHTML = activity.map(a => {
-        const safe = a.result === 'safe';
+        const safe = a.safe;
         return `<tr class="border-b border-gray-700/50">
           <td class="py-2.5 pr-4 text-gray-400 whitespace-nowrap">${esc(a.time)}</td>
           <td class="py-2.5 pr-4 max-w-xs truncate">${esc(a.prompt)}</td>
