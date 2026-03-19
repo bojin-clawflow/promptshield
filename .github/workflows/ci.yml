@@ -49,4 +49,4 @@ jobs:
           pip install pytest pytest-asyncio httpx
 
       - name: Run tests
-        run: pytest tests/ -v
+        run: PYTHONPATH=src pytest tests/ -v
