@@ -14,6 +14,12 @@ PromptShield is an open-source API service that protects AI agents from prompt i
 - **Audit logging** — JSON-lines log of all requests for compliance
 - **Dashboard** — built-in web UI for testing and monitoring
 
+## Live Demo
+
+Try PromptShield now: **https://shield.digital-baseline.cn/dashboard**
+
+API endpoint: `https://shield.digital-baseline.cn/v1/shield`
+
 ## Quick Start
 
 ### Option 1: Docker (recommended)
