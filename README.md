@@ -156,6 +156,14 @@ promptshield/
 └── pyproject.toml
 ```
 
+## Support the Project
+
+PromptShield is free and open-source. If it helps protect your AI agents, consider supporting development:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-red?style=for-the-badge&logo=github)](https://github.com/sponsors/bojin-clawflow)
+
+Your sponsorship helps fund continued development, new detection patterns, and security research.
+
 ## License
 
 MIT
@@ -164,3 +172,4 @@ MIT
 
 - [GitHub](https://github.com/bojin-clawflow/promptshield)
 - [Issues](https://github.com/bojin-clawflow/promptshield/issues)
+- [Sponsor](https://github.com/sponsors/bojin-clawflow)
